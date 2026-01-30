@@ -26,6 +26,29 @@ const crearCita = async (req, res) => {
   }
 };
 
+
+// NUEVA FUNCIÓN
+const obtenerCitas = async (req, res) => {
+  try {
+    // Usamos JOIN para traer el nombre del barbero y del servicio, no solo el ID
+    const listaCitas = await pool.query(`
+      SELECT c.id, c.cliente_nombre, c.fecha_hora, c.estado,
+             b.nombre as barbero, s.nombre as servicio, s.precio
+      FROM citas c
+      JOIN barberos b ON c.barbero_id = b.id
+      JOIN servicios s ON c.servicio_id = s.id
+      ORDER BY c.fecha_hora DESC
+    `);
+    
+    res.json(listaCitas.rows);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: 'Error al obtener las citas' });
+  }
+};
+
+// Agregamos la funcion
 module.exports = {
-  crearCita
+  crearCita, 
+  obtenerCitas
 };
